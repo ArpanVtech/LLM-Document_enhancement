@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DES</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .input-section {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px dashed #cbd5e1;
+            transition: all 0.3s ease;
+        }
+
+        .input-section:hover {
+            border-color: #4f46e5;
+            background: #f1f5f9;
+        }
+
+        .input-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 10px;
+            padding: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .file-upload-area {
+            border: 2px dashed #cbd5e1;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-area:hover {
+            border-color: #4f46e5;
+            background: #f8fafc;
+        }
+
+        .file-upload-area.dragover {
+            border-color: #4f46e5;
+            background: #ede9fe;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: #94a3b8;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            font-size: 1.1rem;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+
+        .upload-subtext {
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        .text-input {
+            width: 100%;
+            min-height: 200px;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #4f46e5;
+        }
+
+        .options-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .options-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1e293b;
+        }
+
+        .option-group {
+            margin-bottom: 25px;
+        }
+
+        .option-group h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #374151;
+        }
+
+        .option-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .option-btn {
+            padding: 10px 20px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .option-btn:hover {
+            border-color: #4f46e5;
+            background: #f8fafc;
+        }
+
+        .option-btn.selected {
+            background: #4f46e5;
+            color: white;
+            border-color: #4f46e5;
+        }
+
+        .process-btn {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        .process-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+        }
+
+        .process-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            display: none;
+        }
+
+        .results-section.show {
+            display: block;
+        }
+
+        .result-item {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border-left: 4px solid #4f46e5;
+        }
+
+        .result-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #1e293b;
+        }
+
+        .result-content {
+            line-height: 1.6;
+            color: #374151;
+            white-space: pre-wrap;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #4f46e5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #dc2626;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .file-info {
+            background: #ecfdf5;
+            color: #059669;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #059669;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .file-info.show {
+            display: block;
+        }
+
+        .agent-status {
+            display: none;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f0f9ff;
+            border-radius: 10px;
+        }
+
+        .agent-status.show {
+            display: block;
+        }
+
+        .agent-progress {
+            margin-top: 15px;
+        }
+
+        .agent-step {
+            padding: 10px;
+            margin: 5px 0;
+            background: #e0f2fe;
+            border-radius: 5px;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .agent-step.active {
+            background: #38bdf8;
+            color: white;
+            opacity: 1;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .option-buttons {
+                flex-direction: column;
+            }
+
+            .option-btn {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Document Enhancement System</h1>
+            <p>Transform your documents with AI-powered improvements, summaries, and insights</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Input Section -->
+            <div class="input-section">
+                <div class="input-tabs">
+                    <button class="tab-button active" onclick="switchTab('file')">Upload File</button>
+                    <button class="tab-button" onclick="switchTab('text')">Paste Text</button>
+                </div>
+
+                <div id="file-tab" class="tab-content active">
+                    <div class="file-upload-area" onclick="document.getElementById('fileInput').click()">
+                        <div class="upload-icon">📁</div>
+                        <div class="upload-text">Click to upload or drag and drop</div>
+                        <div class="upload-subtext">Supports PDF, DOCX, and TXT files</div>
+                        <input type="file" id="fileInput" accept=".pdf,.docx,.txt" style="display: none;">
+                    </div>
+                    <div id="file-info" class="file-info"></div>
+                </div>
+
+                <div id="text-tab" class="tab-content">
+                    <textarea id="textInput" class="text-input" placeholder="Paste your document text here..."></textarea>
+                </div>
+            </div>
+
+            <!-- Options Section -->
+            <div class="options-section">
+                <h2 class="options-title">Enhancement Options</h2>
+                
+                <div class="option-group">
+                    <h3>📝 Summarization</h3>
+                    <div class="option-buttons">
+                        <button class="option-btn" data-type="summarize" data-subtype="general">General Summary</button>
+                        <button class="option-btn" data-type="summarize" data-subtype="executive">Executive Summary</button>
+                        <button class="option-btn" data-type="summarize" data-subtype="bullet_points">Bullet Points</button>
+                        <button class="option-btn" data-type="summarize" data-subtype="abstract">Abstract</button>
+                    </div>
+                </div>
+
+                <div class="option-group">
+                    <h3>✨ Language Improvement</h3>
+                    <div class="option-buttons">
+                        <button class="option-btn" data-type="improve" data-subtype="general">General Improvement</button>
+                        <button class="option-btn" data-type="improve" data-subtype="formal">Make Formal</button>
+                        <button class="option-btn" data-type="improve" data-subtype="concise">Make Concise</button>
+                        <button class="option-btn" data-type="improve" data-subtype="clarity">Improve Clarity</button>
+                        <button class="option-btn" data-type="improve" data-subtype="structure">Fix Structure</button>
+                    </div>
+                </div>
+
+                <div class="option-group">
+                    <h3>🚀 Generate Add-ons</h3>
+                    <div class="option-buttons">
+                        <!-- <button class="option-btn" data-type="generate-addons" data-subtype="headlines">Headlines</button> -->
+                        <button class="option-btn" data-type="generate-addons" data-subtype="follow_up_email">Follow-up Email</button>
+                        <button class="option-btn" data-type="generate-addons" data-subtype="slide_content">Slide Content</button>
+                        <button class="option-btn" data-type="generate-addons" data-subtype="action_items">Action Items</button>
+                        <button class="option-btn" data-type="generate-addons" data-subtype="key_questions">Key Questions</button>
+                        <!-- <button class="option-btn" data-type="generate-addons" data-subtype="social_media">Social Media Posts</button> -->
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <button id="processBtn" class="process-btn" onclick="processDocument()">
+                         Enhance Document
+                    </button>
+                </div>
+            </div>
+
+            <!-- Agent Status -->
+            <div id="agent-status" class="agent-status">
+                <h3>🧠 AI Agents at Work</h3>
+                <div class="agent-progress">
+                    <div class="agent-step">🔍 Analyzing document structure...</div>
+                    <div class="agent-step">📝 Extracting key insights...</div>
+                    <div class="agent-step">✅ Quality checking output...</div>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div id="error-message" class="error-message"></div>
+
+            <!-- Loading -->
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Processing your document with AI...</p>
+            </div>
+
+            <!-- Results Section -->
+            <div id="results" class="results-section">
+                <h2 class="options-title">✨ Enhanced Results</h2>
+                <div id="results-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentText = '';
+        let selectedOptions = [];
+
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+            document.getElementById(`${tab}-tab`).classList.add('active');
+        }
+
+        // File upload handling
+        document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+
+        // Drag and drop
+        const uploadArea = document.querySelector('.file-upload-area');
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+
+        async function handleFile(file) {
+            const fileInfo = document.getElementById('file-info');
+            const errorMessage = document.getElementById('error-message');
+            
+            // Validate file type
+            const allowedTypes = ['application/pdf', 
+                                 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 
+                                 'text/plain'];
+            if (!allowedTypes.includes(file.type)) {
+                showError('Please upload a PDF, DOCX, or TXT file.');
+                return;
+            }
+
+            // Show file info
+            fileInfo.innerHTML = `📄 ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+            fileInfo.classList.add('show');
+            errorMessage.classList.remove('show');
+
+            // Upload file
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentText = result.extracted_text;
+                    fileInfo.innerHTML += `<br>✅ Text extracted successfully (${result.text_length} characters)`;
+                } else {
+                    showError(result.error || 'Failed to process file');
+                }
+            } catch (error) {
+                showError('Error uploading file: ' + error.message);
+            }
+        }
+
+        // Text input handling
+        document.getElementById('textInput').addEventListener('input', (e) => {
+            currentText = e.target.value;
+            document.getElementById('error-message').classList.remove('show');
+        });
+
+        // Option selection
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const type = btn.dataset.type;
+                const subtype = btn.dataset.subtype;
+                
+                // Remove selection from same group
+                const group = btn.closest('.option-group');
+                group.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+                
+                // Add selection to clicked button
+                btn.classList.add('selected');
+                
+                // Update selected options
+                selectedOptions = selectedOptions.filter(opt => opt.type !== type);
+                selectedOptions.push({ type, subtype });
+            });
+        });
+
+        // Process document
+        async function processDocument() {
+            const errorMessage = document.getElementById('error-message');
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            const resultsContent = document.getElementById('results-content');
+            const agentStatus = document.getElementById('agent-status');
+            const steps = document.querySelectorAll('.agent-step');
+
+            // Validate input
+            if (!currentText.trim()) {
+                showError('Please upload a file or enter text to process.');
+                return;
+            }
+
+            if (selectedOptions.length === 0) {
+                showError('Please select at least one enhancement option.');
+                return;
+            }
+
+            // Show loading and agent status
+            errorMessage.classList.remove('show');
+            loading.classList.add('show');
+            agentStatus.classList.add('show');
+            results.classList.remove('show');
+            resultsContent.innerHTML = '';
+
+            try {
+                // Reset steps
+                steps.forEach(step => step.classList.remove('active'));
+                
+                // Process each selected option
+                for (const option of selectedOptions) {
+                    // Step 1: Analyzing
+                    steps[0].classList.add('active');
+                    
+                    const endpoint = `/api/${option.type.replace('-', '-')}`;
+                    const payload = {
+                        text: currentText,
+                        [`${option.type.replace('-', '_')}_type`]: option.subtype
+                    };
+
+                    // Step 2: Processing
+                    steps[1].classList.add('active');
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    // Step 3: Quality check
+                    steps[2].classList.add('active');
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        addResult(option, result);
+                    } else {
+                        showError(`Error processing ${option.type}: ${result.error}`);
+                    }
+                    
+                    // Reset steps for next option
+                    steps.forEach(step => step.classList.remove('active'));
+                }
+
+                // Hide loading and agent status
+                loading.classList.remove('show');
+                agentStatus.classList.remove('show');
+                results.classList.add('show');
+
+            } catch (error) {
+                loading.classList.remove('show');
+                agentStatus.classList.remove('show');
+                showError('Error processing document: ' + error.message);
+            }
+        }
+
+        function addResult(option, result) {
+            const resultsContent = document.getElementById('results-content');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'result-item';
+            
+            let title = '';
+            let content = '';
+            let icon = '';
+            
+            switch (option.type) {
+                case 'summarize':
+                    icon = '📝';
+                    title = `${option.subtype.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())} Summary`;
+                    content = result.summary;
+                    break;
+                case 'improve':
+                    icon = '✨';
+                    title = `${option.subtype.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())} Improvement`;
+                    content = result.improved_text;
+                    break;
+                case 'generate-addons':
+                    icon = '🚀';
+                    title = `${option.subtype.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}`;
+                    content = result.addon_content;
+                    break;
+            }
+            
+            resultDiv.innerHTML = `
+                <div class="result-title">${icon} ${title}</div>
+                <div class="result-content">${content}</div>
+            `;
+            
+            resultsContent.appendChild(resultDiv);
+        }
+
+        function showError(message) {
+            const errorMessage = document.getElementById('error-message');
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+            
+            // Scroll to error message
+            errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    </script>
+</body>
+</html>
